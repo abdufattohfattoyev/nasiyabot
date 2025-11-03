@@ -17,20 +17,17 @@ try:
     PILLOW_AVAILABLE = True
 except ImportError:
     PILLOW_AVAILABLE = False
-    print("⚠️ Pillow kutubxonasi o'rnatilmagan. Rasm yaratish imkoniyati o'chirilgan.")
+    print("⚠️ Pillow kutubxonasi o'rnatilmagan.")
 
 # Doimiy kurs
 DOIMIY_KURS = 12050
 
-# Muddat uchun koeffitsiyentlar (dollar uchun)
+# Muddat uchun koeffitsiyentlar
 KOEFFITSIYENTLAR = {
     3: 16000,
     4: 17500,
     6: 18000
 }
-
-# Logo URL (GitHub yoki boshqa joydan)
-LOGO_URL = "https://i.imgur.com/your-logo.png"  # Bu yerga logo URL kiriting
 
 # =========================
 # LOGGING SOZLASH
@@ -116,37 +113,16 @@ def get_restart_inline_keyboard():
 # RASM YARATISH
 # =========================
 
-def download_logo():
-    """Logoni yuklab olish - bot papkasidan"""
-    try:
-        # Bot papkasidagi logo fayllarni tekshirish
-        logo_paths = [
-            'logo.png',
-            'logo.jpg',
-            'logo.jpeg',
-            'assets/logo.png',
-            'images/logo.png'
-        ]
-
-        for path in logo_paths:
-            if os.path.exists(path):
-                return Image.open(path)
-
-        logger.warning("Logo fayli topilmadi. Logo faylni bot papkasiga joylashtiring (logo.png)")
-    except Exception as e:
-        logger.warning(f"Logo yuklab bo'lmadi: {e}")
-
-    return None
-
-
 def load_fonts():
-    """Fontlarni yuklash - MAKSIMAL O'LCHAMLAR"""
+    """Fontlarni yuklash - SERVERGA MOSLASHTIRISH"""
     fonts = {}
 
     # DejaVu fontlar ro'yxati (Linux serverlar uchun)
     dejavu_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
     ]
 
     # Arial fontlar ro'yxati (Windows uchun)
@@ -158,115 +134,81 @@ def load_fonts():
     ]
 
     try:
-        # MAKSIMAL KATTA FONTLAR
-        try:
-            fonts['title'] = ImageFont.truetype(dejavu_paths[0], 80)  # 70 -> 80
-            fonts['header'] = ImageFont.truetype(dejavu_paths[0], 56)  # 48 -> 56
-            fonts['medium'] = ImageFont.truetype(dejavu_paths[0], 46)  # 40 -> 46
-            fonts['label'] = ImageFont.truetype(dejavu_paths[1], 32)  # 28 -> 32
-            fonts['value'] = ImageFont.truetype(dejavu_paths[0], 44)  # 38 -> 44
-            fonts['small'] = ImageFont.truetype(dejavu_paths[1], 30)  # 26 -> 30
-            fonts['oylik'] = ImageFont.truetype(dejavu_paths[0], 70)  # 62 -> 70
-            fonts['footer'] = ImageFont.truetype(dejavu_paths[0], 38)  # 32 -> 38
-            fonts['footer_small'] = ImageFont.truetype(dejavu_paths[1], 28)  # 24 -> 28
-            fonts['phone'] = ImageFont.truetype(dejavu_paths[1], 32)  # 28 -> 32
-            logger.info("✅ DejaVu fontlar yuklandi (MAKSIMAL o'lchamlar)")
-        except:
-            # Arial orqali urinish
-            fonts['title'] = ImageFont.truetype(arial_paths[1], 80)
-            fonts['header'] = ImageFont.truetype(arial_paths[1], 56)
-            fonts['medium'] = ImageFont.truetype(arial_paths[1], 46)
-            fonts['label'] = ImageFont.truetype(arial_paths[0], 32)
-            fonts['value'] = ImageFont.truetype(arial_paths[1], 44)
-            fonts['small'] = ImageFont.truetype(arial_paths[0], 30)
-            fonts['oylik'] = ImageFont.truetype(arial_paths[1], 70)
-            fonts['footer'] = ImageFont.truetype(arial_paths[1], 38)
-            fonts['footer_small'] = ImageFont.truetype(arial_paths[0], 28)
-            fonts['phone'] = ImageFont.truetype(arial_paths[0], 32)
-            logger.info("✅ Arial fontlar yuklandi (MAKSIMAL o'lchamlar)")
+        # Mavjud fontni topish
+        chosen_paths = None
+
+        for path in dejavu_paths:
+            if os.path.exists(path):
+                chosen_paths = dejavu_paths
+                logger.info(f"✅ DejaVu fontlar topildi: {path}")
+                break
+
+        if not chosen_paths:
+            for path in arial_paths:
+                if os.path.exists(path):
+                    chosen_paths = arial_paths
+                    logger.info(f"✅ Arial fontlar topildi: {path}")
+                    break
+
+        # Fontlarni o'rnatish
+        if chosen_paths:
+            fonts['title'] = ImageFont.truetype(chosen_paths[1], 72)
+            fonts['header'] = ImageFont.truetype(chosen_paths[1], 48)
+            fonts['medium'] = ImageFont.truetype(chosen_paths[1], 40)
+            fonts['label'] = ImageFont.truetype(chosen_paths[0], 28)
+            fonts['value'] = ImageFont.truetype(chosen_paths[1], 38)
+            fonts['small'] = ImageFont.truetype(chosen_paths[0], 26)
+            fonts['oylik'] = ImageFont.truetype(chosen_paths[1], 60)
+            fonts['footer'] = ImageFont.truetype(chosen_paths[1], 32)
+            fonts['footer_small'] = ImageFont.truetype(chosen_paths[0], 24)
+            fonts['phone'] = ImageFont.truetype(chosen_paths[0], 26)
+        else:
+            raise Exception("Fontlar topilmadi")
+
     except Exception as e:
         logger.warning(f"⚠️ Fontlar yuklanmadi, default font ishlatiladi: {e}")
-        # Default fontlarni ishlatish
         default_font = ImageFont.load_default()
-        fonts = {
-            'title': default_font,
-            'header': default_font,
-            'medium': default_font,
-            'label': default_font,
-            'value': default_font,
-            'small': default_font,
-            'oylik': default_font,
-            'footer': default_font,
-            'footer_small': default_font,
-            'phone': default_font
-        }
+        fonts = {key: default_font for key in [
+            'title', 'header', 'medium', 'label', 'value', 'small',
+            'oylik', 'footer', 'footer_small', 'phone'
+        ]}
 
     return fonts
 
 
 def create_result_image(data, result):
-    """Chiroyli va aniq natija rasmi yaratish"""
+    """Chiroyli natija rasmi yaratish"""
     if not PILLOW_AVAILABLE:
         return None
 
     try:
-        width = 1200
-        height = 1450  # Balandlikni oshirdik
+        width = 1000
+        height = 1200
 
-        # Ranglar - TO'LIQ OQ FON
-        bg_color = (255, 255, 255)  # Oq
-        header_color = (52, 52, 52)  # Qora-kulrang
-        text_color = (33, 33, 33)  # To'q kulrang
-        label_color = (120, 120, 120)  # Och kulrang
-        accent_color = (0, 174, 239)  # Turkuaz ko'k
-        light_bg = (255, 255, 255)  # Oq
-        border_color = (230, 230, 230)  # Och kulrang
-        success_color = (76, 175, 80)  # Yashil
+        # Ranglar
+        bg_color = (255, 255, 255)
+        header_color = (52, 52, 52)
+        text_color = (33, 33, 33)
+        label_color = (120, 120, 120)
+        accent_color = (0, 174, 239)
+        border_color = (230, 230, 230)
+        success_color = (76, 175, 80)
 
         img = Image.new('RGB', (width, height), bg_color)
         draw = ImageDraw.Draw(img)
-
-        # Fontlarni yuklash
         fonts = load_fonts()
 
-        y_position = 0
+        y_position = 30
 
-        # HEADER - TO'LIQ OQ FON
-        draw.rectangle([(0, 0), (width, 180)], fill=(255, 255, 255))
+        # HEADER
+        draw.text((width // 2, y_position), "Sebtech", fill=header_color,
+                  font=fonts['title'], anchor="mm")
+        y_position += 70
 
-        # Logo joylashtirish
-        logo = download_logo()
-        if logo:
-            try:
-                logo_width = 200
-                logo_height = int(logo.height * (logo_width / logo.width))
-                logo = logo.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
-                logo_x = (width - logo_width) // 2
-                logo_y = (180 - logo_height) // 2
-
-                if logo.mode == 'RGBA':
-                    img.paste(logo, (logo_x, logo_y), logo)
-                else:
-                    img.paste(logo, (logo_x, logo_y))
-
-                y_position = 180
-            except Exception as e:
-                logger.error(f"Logo joylashtirish xatosi: {e}")
-                draw.text((width // 2, 90), "sebtech", fill=header_color,
-                          font=fonts['title'], anchor="mm")
-                y_position = 180
-        else:
-            draw.text((width // 2, 90), "sebtech", fill=header_color,
-                      font=fonts['title'], anchor="mm")
-            y_position = 180
-
-        y_position += 60  # 50 -> 60
-
-        # HISOB MA'LUMOTLARI - Sarlavha
+        # HISOB MA'LUMOTLARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB MA'LUMOTLARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-
-        y_position += 80  # 70 -> 80
+        y_position += 70
 
         # Ma'lumotlar kartochkasi
         labels = ["Umumiy narx", "Boshlang'ich", "Qoldiq", "Kurs", "Muddat"]
@@ -279,33 +221,30 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_bottom = y_position + 140  # 130 -> 140
-        draw.rectangle([(60, card_top), (width - 60, card_bottom)],
-                       fill=light_bg, outline=border_color, width=4)
+        card_bottom = y_position + 110
+        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
+                       fill=(255, 255, 255), outline=border_color, width=2)
 
-        col_width = (width - 120) // 5
+        col_width = (width - 100) // 5
 
         for i, (label, value) in enumerate(zip(labels, values)):
-            x_pos = 60 + (i * col_width) + (col_width // 2)
-
-            draw.text((x_pos, card_top + 35), label,  # 32 -> 35
+            x_pos = 50 + (i * col_width) + (col_width // 2)
+            draw.text((x_pos, card_top + 25), label,
                       fill=label_color, font=fonts['small'], anchor="mm")
-
-            draw.text((x_pos, card_top + 88), value,  # 80 -> 88
+            draw.text((x_pos, card_top + 65), value,
                       fill=accent_color, font=fonts['value'], anchor="mm")
 
             if i < len(labels) - 1:
-                line_x = 60 + ((i + 1) * col_width)
-                draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
-                          fill=border_color, width=3)
+                line_x = 50 + ((i + 1) * col_width)
+                draw.line([(line_x, card_top + 5), (line_x, card_bottom - 5)],
+                          fill=border_color, width=1)
 
-        y_position += 180  # 170 -> 180
+        y_position += 140
 
-        # HISOB NATIJALARI - Sarlavha
+        # HISOB NATIJALARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB NATIJALARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-
-        y_position += 80  # 70 -> 80
+        y_position += 70
 
         # Natijalar kartochkasi
         result_labels = ["Qoldiq (asosiy)", "Qo'shilgan summa", "Umumiy to'lov"]
@@ -316,70 +255,64 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_bottom = y_position + 140  # 130 -> 140
-        draw.rectangle([(60, card_top), (width - 60, card_bottom)],
-                       fill=light_bg, outline=border_color, width=4)
+        card_bottom = y_position + 110
+        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
+                       fill=(255, 255, 255), outline=border_color, width=2)
 
-        col_width = (width - 120) // 3
+        col_width = (width - 100) // 3
 
         for i, (label, value) in enumerate(zip(result_labels, result_values)):
-            x_pos = 60 + (i * col_width) + (col_width // 2)
-
-            draw.text((x_pos, card_top + 35), label,  # 32 -> 35
+            x_pos = 50 + (i * col_width) + (col_width // 2)
+            draw.text((x_pos, card_top + 25), label,
                       fill=label_color, font=fonts['small'], anchor="mm")
-
-            draw.text((x_pos, card_top + 88), value,  # 80 -> 88
+            draw.text((x_pos, card_top + 65), value,
                       fill=accent_color, font=fonts['value'], anchor="mm")
 
             if i < len(result_labels) - 1:
-                line_x = 60 + ((i + 1) * col_width)
-                draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
-                          fill=border_color, width=3)
+                line_x = 50 + ((i + 1) * col_width)
+                draw.line([(line_x, card_top + 5), (line_x, card_bottom - 5)],
+                          fill=border_color, width=1)
 
-        y_position += 180  # 170 -> 180
+        y_position += 140
 
-        # OYLIK TO'LOV - Alohida katta kartochka
+        # OYLIK TO'LOV
         card_top = y_position
-        card_bottom = y_position + 160  # 150 -> 160
-        draw.rectangle([(60, card_top), (width - 60, card_bottom)],
-                       fill=success_color, outline=success_color, width=4)
+        card_bottom = y_position + 130
+        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
+                       fill=success_color, outline=success_color, width=2)
 
-        draw.text((width // 2, card_top + 45), "OYLIK TO'LOV",  # 42 -> 45
+        draw.text((width // 2, card_top + 30), "OYLIK TO'LOV",
                   fill=(255, 255, 255), font=fonts['header'], anchor="mm")
-
-        draw.text((width // 2, card_top + 108), f"{format_number(result['oylik_tolov'])} so'm",  # 100 -> 108
+        draw.text((width // 2, card_top + 80), f"{format_number(result['oylik_tolov'])} so'm",
                   fill=(255, 255, 255), font=fonts['oylik'], anchor="mm")
 
-        y_position += 200  # 190 -> 200
+        y_position += 160
 
-        # Bo'sh joy
-        y_position += 70  # 60 -> 70
-
-        # FOOTER - Kontakt ma'lumotlar
+        # FOOTER
         draw.text((width // 2, y_position), "Sebtech",
                   fill=header_color, font=fonts['footer'], anchor="mm")
+        y_position += 40
 
-        y_position += 45  # 40 -> 45
         draw.text((width // 2, y_position), "TRADE IN / NASIYA SAVDO",
                   fill=label_color, font=fonts['footer_small'], anchor="mm")
+        y_position += 35
 
-        y_position += 45  # 40 -> 45
         draw.text((width // 2, y_position), "+998 (77) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
+        y_position += 35
 
-        y_position += 42  # 38 -> 42
         draw.text((width // 2, y_position), "+998 (91) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
 
         # BytesIO ga saqlash
         img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format='PNG', quality=100, optimize=False)
+        img.save(img_byte_arr, format='PNG', quality=85, optimize=True)
         img_byte_arr.seek(0)
 
         return img_byte_arr
 
     except Exception as e:
-        logger.error(f"Rasm yaratishda xatolik: {e}")
+        logger.error(f"Rasm yaratishda xatolik: {e}", exc_info=True)
         return None
 
 
@@ -391,7 +324,6 @@ def create_result_image(data, result):
 async def bot_start(message: types.Message, state: FSMContext):
     """Bot boshlanganda"""
     await state.finish()
-
     user_name = message.from_user.full_name or "Foydalanuvchi"
 
     await message.answer(
@@ -402,8 +334,7 @@ async def bot_start(message: types.Message, state: FSMContext):
     )
 
     await message.answer(
-        "1️⃣ Mahsulotning umumiy narxini USD da kiriting:\n"
-        "(Masalan: 1000)"
+        "1️⃣ Mahsulotning umumiy narxini USD da kiriting:\n(Masalan: 1000)"
     )
 
     await NasiyaForm.umumiy_narx.set()
@@ -449,7 +380,6 @@ async def process_boshlangich_tolov(message: types.Message, state: FSMContext):
 
         if boshlangich_tolov < 0:
             await message.answer(
-                f"✅ Umumiy narx: ${format_number(umumiy_narx)}\n\n"
                 "❌ Boshlang'ich to'lov manfiy bo'lishi mumkin emas!\n\n"
                 "2️⃣ Boshlang'ich to'lovni USD da kiriting:\n(Masalan: 500)"
             )
@@ -457,7 +387,6 @@ async def process_boshlangich_tolov(message: types.Message, state: FSMContext):
 
         if boshlangich_tolov >= umumiy_narx:
             await message.answer(
-                f"✅ Umumiy narx: ${format_number(umumiy_narx)}\n\n"
                 "❌ Boshlang'ich to'lov umumiy narxdan kam bo'lishi kerak!\n\n"
                 "2️⃣ Boshlang'ich to'lovni USD da kiriting:\n(Masalan: 500)"
             )
@@ -479,7 +408,6 @@ async def process_boshlangich_tolov(message: types.Message, state: FSMContext):
 
     except ValueError:
         await message.answer(
-            f"✅ Umumiy narx: ${format_number(umumiy_narx)}\n\n"
             "❌ Noto'g'ri format! Iltimos, raqam kiriting.\n\n"
             "2️⃣ Boshlang'ich to'lovni USD da kiriting:\n(Masalan: 500)"
         )
@@ -524,18 +452,13 @@ async def process_muddat_callback(callback_query: types.CallbackQuery, state: FS
         natija += f"🔹 Boshlang'ich to'lov: ${format_number(data.get('boshlangich_tolov', 0))}\n"
         natija += f"🔹 Qoldiq: ${format_number(result['qoldiq_dollar'])}\n"
         natija += f"🔹 Kurs: {format_number(DOIMIY_KURS)} so'm\n"
-        natija += f"🔹 Muddat: {result['muddat']} oy\n"
-        natija += f"🔹 Koeffitsiyent: {format_number(result['koeffitsiyent'])} so'm\n\n"
+        natija += f"🔹 Muddat: {result['muddat']} oy\n\n"
 
         natija += f"💵 <b>Qoldiq (asosiy):</b> {format_number(result['qoldiq_som'])} so'm\n"
         natija += f"➕ <b>Qo'shilgan summa:</b> {format_number(result['qoshilgan_foyda'])} so'm\n"
         natija += f"💰 <b>Umumiy to'lov:</b> {format_number(result['umumiy_tolov'])} so'm\n\n"
 
-        natija += f"💸 <b>Oylik to'lov:</b> {format_number(result['oylik_tolov'])} so'm\n\n"
-
-        natija += "🧾 <b>To'lovlar jadvali:</b>\n"
-        for oy in range(1, muddat + 1):
-            natija += f"{oy}-oy → <b>{format_number(result['oylik_tolov'])} so'm</b>\n"
+        natija += f"💸 <b>Oylik to'lov:</b> {format_number(result['oylik_tolov'])} so'm\n"
 
         await bot.send_message(
             callback_query.message.chat.id,
@@ -555,14 +478,6 @@ async def restart_callback(callback_query: types.CallbackQuery, state: FSMContex
 
     await bot.send_message(
         callback_query.message.chat.id,
-        "Assalomu alaykum! 👋\n\n"
-        "Nasiya hisoblash botiga xush kelibsiz.\n"
-        "Keling, sizning to'lovingizni hisoblaymiz.\n\n"
-        "📝 Quyidagi ma'lumotlarni kiriting:"
-    )
-
-    await bot.send_message(
-        callback_query.message.chat.id,
         "1️⃣ Mahsulotning umumiy narxini USD da kiriting:\n(Masalan: 1000)"
     )
 
@@ -575,16 +490,10 @@ async def help_command(message: types.Message):
     help_text = (
         "📚 <b>Yordam</b>\n\n"
         "Bu bot nasiya to'lovlarini hisoblash uchun yaratilgan.\n\n"
-        "<b>Qanday foydalanish:</b>\n"
-        "1️⃣ /start - Botni boshlash\n"
-        "2️⃣ Mahsulot narxini kiriting\n"
-        "3️⃣ Boshlang'ich to'lovni kiriting\n"
-        "4️⃣ Muddatni tanlang\n"
-        "5️⃣ Natijani ko'ring\n\n"
-        "<b>Muddatlar:</b>\n"
-        "• 3 oy - koeffitsiyent 16,000\n"
-        "• 4 oy - koeffitsiyent 17,500\n"
-        "• 6 oy - koeffitsiyent 18,000\n\n"
+        "<b>Muddatlar va koeffitsiyentlar:</b>\n"
+        "• 3 oy - 16,000\n"
+        "• 4 oy - 17,500\n"
+        "• 6 oy - 18,000\n\n"
         "<b>Doimiy kurs:</b> 12,050 so'm"
     )
     await message.answer(help_text, parse_mode='HTML')
@@ -595,6 +504,5 @@ async def unknown_message(message: types.Message):
     """Noma'lum xabar"""
     await message.answer(
         "❌ Noto'g'ri ma'lumot!\n\n"
-        "Qayta boshlash uchun /start buyrug'ini yuboring.\n"
-        "Yordam uchun /help buyrug'ini yuboring."
+        "Qayta boshlash uchun /start buyrug'ini yuboring."
     )
