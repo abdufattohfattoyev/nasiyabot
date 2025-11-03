@@ -145,7 +145,7 @@ def create_result_image(data, result):
 
     try:
         width = 1200
-        height = 1350  # Balandlik
+        height = 1350  # Balandlikni oshirdik (oylik to'lov va footer uchun)
 
         # Ranglar - TO'LIQ OQ FON
         bg_color = (255, 255, 255)  # Oq
@@ -170,8 +170,7 @@ def create_result_image(data, result):
             font_small = ImageFont.truetype("arial.ttf", 24)
             font_oylik = ImageFont.truetype("arialbd.ttf", 56)  # Oylik to'lov uchun kattaroq
             font_footer = ImageFont.truetype("arialbd.ttf", 28)
-            font_footer_small = ImageFont.truetype("arial.ttf", 20)  # Kichikroq qilindi (26 -> 20)
-            font_phone = ImageFont.truetype("arial.ttf", 26)
+            font_footer_small = ImageFont.truetype("arial.ttf", 26)
         except:
             try:
                 font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 64)
@@ -182,8 +181,7 @@ def create_result_image(data, result):
                 font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
                 font_oylik = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 56)
                 font_footer = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)
-                font_footer_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
-                font_phone = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 26)
+                font_footer_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 26)
             except:
                 font_title = ImageFont.load_default()
                 font_header = ImageFont.load_default()
@@ -194,7 +192,6 @@ def create_result_image(data, result):
                 font_oylik = ImageFont.load_default()
                 font_footer = ImageFont.load_default()
                 font_footer_small = ImageFont.load_default()
-                font_phone = ImageFont.load_default()
 
         y_position = 0
 
@@ -321,24 +318,21 @@ def create_result_image(data, result):
 
         y_position += 180
 
-        # Bo'sh joy qo'shish (oylik to'lovdan keyin)
-        y_position += 50  # 50px bo'sh joy
-
         # FOOTER - Kontakt ma'lumotlar
         draw.text((width // 2, y_position), "Sebtech",
                   fill=header_color, font=font_footer, anchor="mm")
 
         y_position += 35
         draw.text((width // 2, y_position), "TRADE IN / NASIYA SAVDO",
-                  fill=label_color, font=font_footer_small, anchor="mm")  # Kichikroq font
+                  fill=label_color, font=font_footer_small, anchor="mm")
 
-        y_position += 35  # Oraliqni kamaytirildi (40 -> 35)
+        y_position += 40
         draw.text((width // 2, y_position), "+998 (77) 285-99-99",
-                  fill=accent_color, font=font_phone, anchor="mm")
+                  fill=accent_color, font=font_footer_small, anchor="mm")
 
         y_position += 35
         draw.text((width // 2, y_position), "+998 (91) 285-99-99",
-                  fill=accent_color, font=font_phone, anchor="mm")
+                  fill=accent_color, font=font_footer_small, anchor="mm")
 
         # BytesIO ga saqlash
         img_byte_arr = io.BytesIO()
