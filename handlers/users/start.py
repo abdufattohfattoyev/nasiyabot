@@ -114,7 +114,7 @@ def get_restart_inline_keyboard():
 # =========================
 
 def load_fonts():
-    """Fontlarni yuklash - SERVERGA MOSLASHTIRISH"""
+    """Fontlarni yuklash - OPTIMAL O'LCHAMLAR"""
     fonts = {}
 
     # Barcha mumkin bo'lgan font manzillari
@@ -137,7 +137,7 @@ def load_fonts():
     # Font manzillarini topish
     for path in all_paths:
         if os.path.exists(path):
-            if 'Bold' in path or 'bold' in path:
+            if 'Bold' in path or 'bold' in path or 'bd' in path.lower():
                 if not bold_font_path:
                     bold_font_path = path
                     logger.info(f"✅ Bold font topildi: {path}")
@@ -154,17 +154,18 @@ def load_fonts():
 
     try:
         if bold_font_path and regular_font_path:
-            fonts['title'] = ImageFont.truetype(bold_font_path, 72)
-            fonts['header'] = ImageFont.truetype(bold_font_path, 48)
-            fonts['medium'] = ImageFont.truetype(bold_font_path, 40)
-            fonts['label'] = ImageFont.truetype(regular_font_path, 28)
-            fonts['value'] = ImageFont.truetype(bold_font_path, 38)
-            fonts['small'] = ImageFont.truetype(regular_font_path, 26)
-            fonts['oylik'] = ImageFont.truetype(bold_font_path, 60)
-            fonts['footer'] = ImageFont.truetype(bold_font_path, 32)
-            fonts['footer_small'] = ImageFont.truetype(regular_font_path, 24)
-            fonts['phone'] = ImageFont.truetype(regular_font_path, 26)
-            logger.info("✅ Fontlar yuklandi")
+            # OPTIMAL SHRIFT O'LCHAMLARI
+            fonts['title'] = ImageFont.truetype(bold_font_path, 64)      # 72 -> 64
+            fonts['header'] = ImageFont.truetype(bold_font_path, 42)     # 48 -> 42
+            fonts['medium'] = ImageFont.truetype(bold_font_path, 36)     # 40 -> 36
+            fonts['label'] = ImageFont.truetype(regular_font_path, 24)   # 28 -> 24
+            fonts['value'] = ImageFont.truetype(bold_font_path, 34)      # 38 -> 34
+            fonts['small'] = ImageFont.truetype(regular_font_path, 22)   # 26 -> 22
+            fonts['oylik'] = ImageFont.truetype(bold_font_path, 52)      # 60 -> 52
+            fonts['footer'] = ImageFont.truetype(bold_font_path, 28)     # 32 -> 28
+            fonts['footer_small'] = ImageFont.truetype(regular_font_path, 20) # 24 -> 20
+            fonts['phone'] = ImageFont.truetype(regular_font_path, 22)   # 26 -> 22
+            logger.info("✅ Fontlar yuklandi (OPTIMAL o'lchamlar)")
         else:
             raise Exception("Fontlar topilmadi")
 
@@ -186,7 +187,7 @@ def create_result_image(data, result):
 
     try:
         width = 1080
-        height = 1400
+        height = 1350  # 1400 -> 1350
 
         # Ranglar
         bg_color = (255, 255, 255)
@@ -201,17 +202,17 @@ def create_result_image(data, result):
         draw = ImageDraw.Draw(img)
         fonts = load_fonts()
 
-        y_position = 40
+        y_position = 35  # 40 -> 35
 
         # HEADER - LOGO/NOM
         draw.text((width // 2, y_position), "Sebtech", fill=header_color,
                   font=fonts['title'], anchor="mm")
-        y_position += 90
+        y_position += 80  # 90 -> 80
 
         # HISOB MA'LUMOTLARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB MA'LUMOTLARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-        y_position += 80
+        y_position += 70  # 80 -> 70
 
         # Ma'lumotlar kartochkasi
         labels = ["Umumiy narx", "Boshlang'ich", "Qoldiq", "Kurs", "Muddat"]
@@ -224,7 +225,7 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_height = 130
+        card_height = 120  # 130 -> 120
         card_bottom = card_top + card_height
         draw.rectangle([(40, card_top), (width - 40, card_bottom)],
                        fill=(255, 255, 255), outline=border_color, width=3)
@@ -234,9 +235,9 @@ def create_result_image(data, result):
         for i, (label, value) in enumerate(zip(labels, values)):
             x_pos = 40 + (i * col_width) + (col_width // 2)
 
-            draw.text((x_pos, card_top + 32), label,
+            draw.text((x_pos, card_top + 28), label,  # 32 -> 28
                       fill=label_color, font=fonts['label'], anchor="mm")
-            draw.text((x_pos, card_top + 85), value,
+            draw.text((x_pos, card_top + 78), value,  # 85 -> 78
                       fill=accent_color, font=fonts['medium'], anchor="mm")
 
             if i < len(labels) - 1:
@@ -244,12 +245,12 @@ def create_result_image(data, result):
                 draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
                           fill=border_color, width=2)
 
-        y_position += 160
+        y_position += 150  # 160 -> 150
 
         # HISOB NATIJALARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB NATIJALARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-        y_position += 80
+        y_position += 70  # 80 -> 70
 
         # Natijalar kartochkasi
         result_labels = ["Qoldiq (asosiy)", "Qo'shilgan summa", "Umumiy to'lov"]
@@ -260,7 +261,7 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_height = 130
+        card_height = 120  # 130 -> 120
         card_bottom = card_top + card_height
         draw.rectangle([(40, card_top), (width - 40, card_bottom)],
                        fill=(255, 255, 255), outline=border_color, width=3)
@@ -270,9 +271,9 @@ def create_result_image(data, result):
         for i, (label, value) in enumerate(zip(result_labels, result_values)):
             x_pos = 40 + (i * col_width) + (col_width // 2)
 
-            draw.text((x_pos, card_top + 32), label,
+            draw.text((x_pos, card_top + 28), label,  # 32 -> 28
                       fill=label_color, font=fonts['label'], anchor="mm")
-            draw.text((x_pos, card_top + 85), value,
+            draw.text((x_pos, card_top + 78), value,  # 85 -> 78
                       fill=accent_color, font=fonts['medium'], anchor="mm")
 
             if i < len(result_labels) - 1:
@@ -280,41 +281,41 @@ def create_result_image(data, result):
                 draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
                           fill=border_color, width=2)
 
-        y_position += 160
+        y_position += 150  # 160 -> 150
 
         # OYLIK TO'LOV
         card_top = y_position
-        card_bottom = y_position + 150
+        card_bottom = y_position + 140  # 150 -> 140
         draw.rectangle([(40, card_top), (width - 40, card_bottom)],
                        fill=success_color, outline=success_color, width=3)
 
-        draw.text((width // 2, card_top + 35), "OYLIK TO'LOV",
+        draw.text((width // 2, card_top + 32), "OYLIK TO'LOV",  # 35 -> 32
                   fill=(255, 255, 255), font=fonts['header'], anchor="mm")
-        draw.text((width // 2, card_top + 95), f"{format_number(result['oylik_tolov'])} so'm",
+        draw.text((width // 2, card_top + 88), f"{format_number(result['oylik_tolov'])} so'm",  # 95 -> 88
                   fill=(255, 255, 255), font=fonts['oylik'], anchor="mm")
 
-        y_position += 180
+        y_position += 170  # 180 -> 170
 
         # FOOTER
         y_position += 50
         draw.text((width // 2, y_position), "Sebtech",
                   fill=header_color, font=fonts['footer'], anchor="mm")
-        y_position += 50
+        y_position += 45  # 50 -> 45
 
         draw.text((width // 2, y_position), "TRADE IN / NASIYA SAVDO",
                   fill=label_color, font=fonts['footer_small'], anchor="mm")
-        y_position += 45
+        y_position += 40  # 45 -> 40
 
         draw.text((width // 2, y_position), "+998 (77) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
-        y_position += 40
+        y_position += 38  # 40 -> 38
 
         draw.text((width // 2, y_position), "+998 (91) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
 
         # BytesIO ga saqlash
         img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format='PNG', quality=90, optimize=True)
+        img.save(img_byte_arr, format='PNG', quality=95, optimize=True)
         img_byte_arr.seek(0)
 
         return img_byte_arr
