@@ -185,8 +185,8 @@ def create_result_image(data, result):
         return None
 
     try:
-        width = 1000
-        height = 1200
+        width = 1080
+        height = 1400
 
         # Ranglar
         bg_color = (255, 255, 255)
@@ -194,24 +194,24 @@ def create_result_image(data, result):
         text_color = (33, 33, 33)
         label_color = (120, 120, 120)
         accent_color = (0, 174, 239)
-        border_color = (230, 230, 230)
+        border_color = (220, 220, 220)
         success_color = (76, 175, 80)
 
         img = Image.new('RGB', (width, height), bg_color)
         draw = ImageDraw.Draw(img)
         fonts = load_fonts()
 
-        y_position = 30
+        y_position = 40
 
-        # HEADER
+        # HEADER - LOGO/NOM
         draw.text((width // 2, y_position), "Sebtech", fill=header_color,
                   font=fonts['title'], anchor="mm")
-        y_position += 70
+        y_position += 90
 
         # HISOB MA'LUMOTLARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB MA'LUMOTLARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-        y_position += 70
+        y_position += 80
 
         # Ma'lumotlar kartochkasi
         labels = ["Umumiy narx", "Boshlang'ich", "Qoldiq", "Kurs", "Muddat"]
@@ -224,30 +224,32 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_bottom = y_position + 110
-        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
-                       fill=(255, 255, 255), outline=border_color, width=2)
+        card_height = 130
+        card_bottom = card_top + card_height
+        draw.rectangle([(40, card_top), (width - 40, card_bottom)],
+                       fill=(255, 255, 255), outline=border_color, width=3)
 
-        col_width = (width - 100) // 5
+        col_width = (width - 80) // 5
 
         for i, (label, value) in enumerate(zip(labels, values)):
-            x_pos = 50 + (i * col_width) + (col_width // 2)
-            draw.text((x_pos, card_top + 25), label,
-                      fill=label_color, font=fonts['small'], anchor="mm")
-            draw.text((x_pos, card_top + 65), value,
-                      fill=accent_color, font=fonts['value'], anchor="mm")
+            x_pos = 40 + (i * col_width) + (col_width // 2)
+
+            draw.text((x_pos, card_top + 32), label,
+                      fill=label_color, font=fonts['label'], anchor="mm")
+            draw.text((x_pos, card_top + 85), value,
+                      fill=accent_color, font=fonts['medium'], anchor="mm")
 
             if i < len(labels) - 1:
-                line_x = 50 + ((i + 1) * col_width)
-                draw.line([(line_x, card_top + 5), (line_x, card_bottom - 5)],
-                          fill=border_color, width=1)
+                line_x = 40 + ((i + 1) * col_width)
+                draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
+                          fill=border_color, width=2)
 
-        y_position += 140
+        y_position += 160
 
         # HISOB NATIJALARI SARLAVHA
         draw.text((width // 2, y_position), "HISOB NATIJALARI",
                   fill=text_color, font=fonts['header'], anchor="mm")
-        y_position += 70
+        y_position += 80
 
         # Natijalar kartochkasi
         result_labels = ["Qoldiq (asosiy)", "Qo'shilgan summa", "Umumiy to'lov"]
@@ -258,58 +260,61 @@ def create_result_image(data, result):
         ]
 
         card_top = y_position
-        card_bottom = y_position + 110
-        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
-                       fill=(255, 255, 255), outline=border_color, width=2)
+        card_height = 130
+        card_bottom = card_top + card_height
+        draw.rectangle([(40, card_top), (width - 40, card_bottom)],
+                       fill=(255, 255, 255), outline=border_color, width=3)
 
-        col_width = (width - 100) // 3
+        col_width = (width - 80) // 3
 
         for i, (label, value) in enumerate(zip(result_labels, result_values)):
-            x_pos = 50 + (i * col_width) + (col_width // 2)
-            draw.text((x_pos, card_top + 25), label,
-                      fill=label_color, font=fonts['small'], anchor="mm")
-            draw.text((x_pos, card_top + 65), value,
-                      fill=accent_color, font=fonts['value'], anchor="mm")
+            x_pos = 40 + (i * col_width) + (col_width // 2)
+
+            draw.text((x_pos, card_top + 32), label,
+                      fill=label_color, font=fonts['label'], anchor="mm")
+            draw.text((x_pos, card_top + 85), value,
+                      fill=accent_color, font=fonts['medium'], anchor="mm")
 
             if i < len(result_labels) - 1:
-                line_x = 50 + ((i + 1) * col_width)
-                draw.line([(line_x, card_top + 5), (line_x, card_bottom - 5)],
-                          fill=border_color, width=1)
-
-        y_position += 140
-
-        # OYLIK TO'LOV
-        card_top = y_position
-        card_bottom = y_position + 130
-        draw.rectangle([(50, card_top), (width - 50, card_bottom)],
-                       fill=success_color, outline=success_color, width=2)
-
-        draw.text((width // 2, card_top + 30), "OYLIK TO'LOV",
-                  fill=(255, 255, 255), font=fonts['header'], anchor="mm")
-        draw.text((width // 2, card_top + 80), f"{format_number(result['oylik_tolov'])} so'm",
-                  fill=(255, 255, 255), font=fonts['oylik'], anchor="mm")
+                line_x = 40 + ((i + 1) * col_width)
+                draw.line([(line_x, card_top + 10), (line_x, card_bottom - 10)],
+                          fill=border_color, width=2)
 
         y_position += 160
 
+        # OYLIK TO'LOV
+        card_top = y_position
+        card_bottom = y_position + 150
+        draw.rectangle([(40, card_top), (width - 40, card_bottom)],
+                       fill=success_color, outline=success_color, width=3)
+
+        draw.text((width // 2, card_top + 35), "OYLIK TO'LOV",
+                  fill=(255, 255, 255), font=fonts['header'], anchor="mm")
+        draw.text((width // 2, card_top + 95), f"{format_number(result['oylik_tolov'])} so'm",
+                  fill=(255, 255, 255), font=fonts['oylik'], anchor="mm")
+
+        y_position += 180
+
         # FOOTER
+        y_position += 50
         draw.text((width // 2, y_position), "Sebtech",
                   fill=header_color, font=fonts['footer'], anchor="mm")
-        y_position += 40
+        y_position += 50
 
         draw.text((width // 2, y_position), "TRADE IN / NASIYA SAVDO",
                   fill=label_color, font=fonts['footer_small'], anchor="mm")
-        y_position += 35
+        y_position += 45
 
         draw.text((width // 2, y_position), "+998 (77) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
-        y_position += 35
+        y_position += 40
 
         draw.text((width // 2, y_position), "+998 (91) 285-99-99",
                   fill=accent_color, font=fonts['phone'], anchor="mm")
 
         # BytesIO ga saqlash
         img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format='PNG', quality=85, optimize=True)
+        img.save(img_byte_arr, format='PNG', quality=90, optimize=True)
         img_byte_arr.seek(0)
 
         return img_byte_arr
