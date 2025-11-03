@@ -117,56 +117,59 @@ def load_fonts():
     """Fontlarni yuklash - SERVERGA MOSLASHTIRISH"""
     fonts = {}
 
-    # DejaVu fontlar ro'yxati (Linux serverlar uchun)
-    dejavu_paths = [
+    # Barcha mumkin bo'lgan font manzillari
+    all_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
-    ]
-
-    # Arial fontlar ro'yxati (Windows uchun)
-    arial_paths = [
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
         "arial.ttf",
         "arialbd.ttf",
         "C:\\Windows\\Fonts\\arial.ttf",
         "C:\\Windows\\Fonts\\arialbd.ttf"
     ]
 
+    bold_font_path = None
+    regular_font_path = None
+
+    # Font manzillarini topish
+    for path in all_paths:
+        if os.path.exists(path):
+            if 'Bold' in path or 'bold' in path:
+                if not bold_font_path:
+                    bold_font_path = path
+                    logger.info(f"✅ Bold font topildi: {path}")
+            else:
+                if not regular_font_path:
+                    regular_font_path = path
+                    logger.info(f"✅ Regular font topildi: {path}")
+
+    # Agar biri topilmasa, ikkinchisini ishlatish
+    if not bold_font_path:
+        bold_font_path = regular_font_path
+    if not regular_font_path:
+        regular_font_path = bold_font_path
+
     try:
-        # Mavjud fontni topish
-        chosen_paths = None
-
-        for path in dejavu_paths:
-            if os.path.exists(path):
-                chosen_paths = dejavu_paths
-                logger.info(f"✅ DejaVu fontlar topildi: {path}")
-                break
-
-        if not chosen_paths:
-            for path in arial_paths:
-                if os.path.exists(path):
-                    chosen_paths = arial_paths
-                    logger.info(f"✅ Arial fontlar topildi: {path}")
-                    break
-
-        # Fontlarni o'rnatish
-        if chosen_paths:
-            fonts['title'] = ImageFont.truetype(chosen_paths[1], 72)
-            fonts['header'] = ImageFont.truetype(chosen_paths[1], 48)
-            fonts['medium'] = ImageFont.truetype(chosen_paths[1], 40)
-            fonts['label'] = ImageFont.truetype(chosen_paths[0], 28)
-            fonts['value'] = ImageFont.truetype(chosen_paths[1], 38)
-            fonts['small'] = ImageFont.truetype(chosen_paths[0], 26)
-            fonts['oylik'] = ImageFont.truetype(chosen_paths[1], 60)
-            fonts['footer'] = ImageFont.truetype(chosen_paths[1], 32)
-            fonts['footer_small'] = ImageFont.truetype(chosen_paths[0], 24)
-            fonts['phone'] = ImageFont.truetype(chosen_paths[0], 26)
+        if bold_font_path and regular_font_path:
+            fonts['title'] = ImageFont.truetype(bold_font_path, 72)
+            fonts['header'] = ImageFont.truetype(bold_font_path, 48)
+            fonts['medium'] = ImageFont.truetype(bold_font_path, 40)
+            fonts['label'] = ImageFont.truetype(regular_font_path, 28)
+            fonts['value'] = ImageFont.truetype(bold_font_path, 38)
+            fonts['small'] = ImageFont.truetype(regular_font_path, 26)
+            fonts['oylik'] = ImageFont.truetype(bold_font_path, 60)
+            fonts['footer'] = ImageFont.truetype(bold_font_path, 32)
+            fonts['footer_small'] = ImageFont.truetype(regular_font_path, 24)
+            fonts['phone'] = ImageFont.truetype(regular_font_path, 26)
+            logger.info("✅ Fontlar yuklandi")
         else:
             raise Exception("Fontlar topilmadi")
 
     except Exception as e:
-        logger.warning(f"⚠️ Fontlar yuklanmadi, default font ishlatiladi: {e}")
+        logger.warning(f"⚠️ Fontlar yuklanmadi: {e}")
         default_font = ImageFont.load_default()
         fonts = {key: default_font for key in [
             'title', 'header', 'medium', 'label', 'value', 'small',
